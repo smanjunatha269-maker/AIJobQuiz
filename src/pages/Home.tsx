@@ -1,65 +1,68 @@
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import Card from '../components/Card'
-
-const features = [
-  {
-    title: 'Role-Aware Skills',
-    description:
-      'Preview the skills and topics that matter most for your target role before you start practicing.',
-  },
-  {
-    title: 'Tailored Quizzes',
-    description:
-      'Take focused quizzes designed around real interview expectations for your chosen position.',
-  },
-  {
-    title: 'Actionable Results',
-    description:
-      'Review your performance with clear breakdowns so you know exactly what to improve next.',
-  },
-]
+import { mockSkills } from '../services/mockData'
 
 export default function Home() {
+  const [jobDescription, setJobDescription] = useState('')
+  const navigate = useNavigate()
+
+  const isEmpty = jobDescription.trim().length === 0
+
+  const handleGenerateQuiz = () => {
+    if (isEmpty) return
+    // AI integration is not implemented yet — pass mock skills to the preview page.
+    navigate('/skills', {
+      state: { jobDescription, skills: mockSkills },
+    })
+  }
+
   return (
-    <div className="flex flex-col gap-16">
-      <section className="mx-auto max-w-3xl pt-8 text-center sm:pt-16">
+    <div className="mx-auto flex max-w-3xl flex-col gap-10 pt-6 sm:pt-12">
+      <section className="text-center">
         <span className="inline-block rounded-full bg-indigo-50 px-4 py-1.5 text-sm font-medium text-indigo-700">
           AI-powered interview preparation
         </span>
         <h1 className="mt-6 text-4xl font-bold tracking-tight text-slate-900 sm:text-5xl">
-          Prepare for your next role with{' '}
-          <span className="text-indigo-600">confidence</span>
+          RolePrep <span className="text-indigo-600">AI</span>
         </h1>
-        <p className="mt-6 text-lg leading-relaxed text-slate-600">
-          RolePrep AI helps you understand the skills your target role demands, practice with
-          tailored quizzes, and track your readiness — all in one place.
+        <p className="mt-4 text-lg leading-relaxed text-slate-600">
+          Turn any Job Description into an Interview Quiz.
         </p>
-        <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link
-            to="/skills"
-            className="w-full rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 sm:w-auto"
-          >
-            Preview Skills
-          </Link>
-          <Link
-            to="/quiz"
-            className="w-full rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 sm:w-auto"
-          >
-            Start a Quiz
-          </Link>
-        </div>
       </section>
 
-      <section>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature) => (
-            <Card key={feature.title}>
-              <h2 className="text-lg font-semibold text-slate-900">{feature.title}</h2>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600">{feature.description}</p>
-            </Card>
-          ))}
+      <Card>
+        <label htmlFor="job-description" className="block text-sm font-semibold text-slate-900">
+          Job Description
+        </label>
+        <p className="mt-1 text-sm text-slate-500">
+          Paste the job description you want to prepare for.
+        </p>
+
+        <textarea
+          id="job-description"
+          value={jobDescription}
+          onChange={(event) => setJobDescription(event.target.value)}
+          placeholder="Paste the job description here…"
+          rows={12}
+          className="mt-4 w-full resize-y rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm leading-relaxed text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+        />
+
+        <div className="mt-3 flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">
+          <span className="text-sm tabular-nums text-slate-500">
+            {jobDescription.length.toLocaleString()}{' '}
+            {jobDescription.length === 1 ? 'character' : 'characters'}
+          </span>
+          <button
+            type="button"
+            onClick={handleGenerateQuiz}
+            disabled={isEmpty}
+            className="rounded-lg bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+          >
+            Generate Quiz
+          </button>
         </div>
-      </section>
+      </Card>
     </div>
   )
 }
