@@ -8,10 +8,19 @@ Built with React, TypeScript, Vite, Tailwind CSS, and React Router.
 
 ```bash
 npm install
+cp .env.example .env   # then add your OpenAI API key
 npm run dev
 ```
 
 Then open http://localhost:5173 in your browser.
+
+### Environment Variables
+
+| Variable              | Description                                             |
+| --------------------- | ------------------------------------------------------- |
+| `VITE_OPENAI_API_KEY` | OpenAI API key used to analyze job descriptions and generate quizzes |
+
+> Security note: Vite exposes `VITE_`-prefixed variables to the browser. Use a key with a spend limit for local development, and proxy the OpenAI call through a backend before deploying publicly.
 
 ## Scripts
 
@@ -35,10 +44,8 @@ Then open http://localhost:5173 in your browser.
 src/
   components/   Shared UI components (layout, navbar, cards)
   pages/        Route-level page components
-  services/     API and AI integration (stubs for now)
-  hooks/        Custom React hooks (stubs for now)
+  services/     AI integration (OpenAI-powered skill extraction and quiz generation)
+  hooks/        Custom React hooks
   utils/        Shared utility functions
   types/        Shared TypeScript types
 ```
-
-> Note: Business logic and AI integration are not implemented yet — the UI is scaffolded with placeholder content.
