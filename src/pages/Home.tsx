@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Card from '../components/Card'
-import { mockSkills } from '../services/mockData'
 
 export default function Home() {
   const [jobDescription, setJobDescription] = useState('')
@@ -11,10 +10,7 @@ export default function Home() {
 
   const handleGenerateQuiz = () => {
     if (isEmpty) return
-    // AI integration is not implemented yet — pass mock skills to the preview page.
-    navigate('/skills', {
-      state: { jobDescription, skills: mockSkills },
-    })
+    navigate('/skills', { state: { jobDescription } })
   }
 
   return (

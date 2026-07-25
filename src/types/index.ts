@@ -14,6 +14,11 @@ export interface QuizQuestion {
   correctOptionIndex: number
 }
 
+export interface ExtractSkillsAndQuizResponse {
+  skills: Skill[]
+  questions: QuizQuestion[]
+}
+
 export interface QuizResult {
   score: number
   totalQuestions: number
