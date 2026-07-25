@@ -29,8 +29,14 @@ export default function SkillsPreview() {
       .then((response) => {
         if (!cancelled) setData(response)
       })
-      .catch(() => {
-        if (!cancelled) setError('Something went wrong while analyzing the job description.')
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          setError(
+            err instanceof Error
+              ? err.message
+              : 'Something went wrong while analyzing the job description.',
+          )
+        }
       })
       .finally(() => {
         if (!cancelled) setIsLoading(false)
@@ -97,11 +103,10 @@ export default function SkillsPreview() {
             <ul className="mt-4 flex flex-wrap gap-2">
               {data.skills.map((skill) => (
                 <li
-                  key={skill.id}
+                  key={skill}
                   className="inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50 px-4 py-1.5 text-sm font-medium text-indigo-700"
                 >
-                  {skill.name}
-                  <span className="text-xs font-normal text-indigo-400">{skill.level}</span>
+                  {skill}
                 </li>
               ))}
             </ul>
