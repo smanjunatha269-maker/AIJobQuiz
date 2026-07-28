@@ -5,7 +5,7 @@
 // exposed to the browser.
 
 import type { VercelRequest, VercelResponse } from '@vercel/node'
-import { parseSkillsAndQuizResponse } from './lib/quizValidation'
+import { parseSkillsAndQuizResponse } from '../lib/quizValidation.js'
 
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
 const OPENROUTER_MODEL = 'openai/gpt-4o-mini'

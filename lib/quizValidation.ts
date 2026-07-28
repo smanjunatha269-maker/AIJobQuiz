@@ -1,4 +1,4 @@
-import type { ExtractSkillsAndQuizResponse, QuizQuestion } from '../../src/types'
+import type { ExtractSkillsAndQuizResponse, QuizQuestion } from '../src/types'
 
 export function isQuizQuestion(value: unknown): value is QuizQuestion {
   const question = value as QuizQuestion
