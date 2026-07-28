@@ -21,6 +21,11 @@ export interface ExtractSkillsAndQuizResponse {
   questions: QuizQuestion[]
 }
 
+/** Structured JSON returned when generating a fresh quiz from existing skills. */
+export interface GenerateNewQuizResponse {
+  questions: QuizQuestion[]
+}
+
 export interface QuizResult {
   score: number
   totalQuestions: number

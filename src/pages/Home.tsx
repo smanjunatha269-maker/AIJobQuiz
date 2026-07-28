@@ -22,7 +22,8 @@ export default function Home() {
       setSession({
         jobDescription,
         skills: result.skills,
-        questions: result.questions,
+        currentQuiz: result.questions,
+        quizHistory: [],
       })
       navigate('/quiz')
     } catch (err) {

@@ -8,8 +8,8 @@ import type { QuizQuestion } from '../types'
 
 export default function Quiz() {
   const navigate = useNavigate()
-  const { session, setResults } = useQuizContext()
-  const questions = session?.questions
+  const { session, setResults, quizKey } = useQuizContext()
+  const questions = session?.currentQuiz
 
   const handleComplete = useCallback(
     (score: number) => {
@@ -37,7 +37,7 @@ export default function Quiz() {
     )
   }
 
-  return <QuizContent questions={questions} onComplete={handleComplete} />
+  return <QuizContent key={quizKey} questions={questions} onComplete={handleComplete} />
 }
 
 interface QuizContentProps {

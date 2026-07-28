@@ -1,18 +1,19 @@
 // AI service layer — the single entry point for all AI-powered features.
 //
 // The UI never talks to the LLM directly. This module calls our own backend
-// (a Vercel Serverless Function at /api/generate-quiz), which holds the API
-// key and all prompt/model logic. Swapping models or providers only requires
-// changing the serverless function — the UI and this interface stay the same.
+// (Vercel Serverless Functions), which hold the API key and all prompt/model
+// logic. Swapping models or providers only requires changing the serverless
+// functions — the UI and this interface stay the same.
 
-import type { ExtractSkillsAndQuizResponse } from '../types'
+import type {
+  ExtractSkillsAndQuizResponse,
+  GenerateNewQuizResponse,
+  QuizQuestion,
+} from '../types'
 
 /**
  * Sends the complete job description to the backend, which makes a single AI
  * request and returns the extracted skills plus the generated 10-question quiz.
- *
- * Throws if the request fails or the response is not valid; callers should
- * catch and show a friendly error message.
  */
 export async function extractSkillsAndQuiz(
   jobDescription: string,
@@ -33,4 +34,30 @@ export async function extractSkillsAndQuiz(
   }
 
   return data
+}
+
+/**
+ * Generates a fresh 10-question quiz from existing skills, avoiding questions
+ * that were already asked in the current session.
+ */
+export async function generateNewQuiz(params: {
+  skills: string[]
+  previousQuestions: QuizQuestion[]
+}): Promise<QuizQuestion[]> {
+  const response = await fetch('/api/generate-new-quiz', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(params),
+  })
+
+  if (!response.ok) {
+    throw new Error(`New quiz generation request failed with status ${response.status}`)
+  }
+
+  const data = (await response.json()) as GenerateNewQuizResponse
+  if (!Array.isArray(data?.questions)) {
+    throw new Error('New quiz generation returned an unexpected response.')
+  }
+
+  return data.questions
 }
