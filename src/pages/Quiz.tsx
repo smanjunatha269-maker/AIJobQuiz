@@ -1,34 +1,23 @@
 import { useCallback } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Card from '../components/Card'
 import QuizCard from '../components/QuizCard'
+import { useQuizContext } from '../context/QuizContext'
 import { useQuiz } from '../hooks/useQuiz'
 import type { QuizQuestion } from '../types'
 
-interface QuizPageState {
-  jobDescription?: string
-  skills?: string[]
-  questions?: QuizQuestion[]
-}
-
 export default function Quiz() {
-  const location = useLocation()
   const navigate = useNavigate()
-  const { jobDescription, skills, questions } = (location.state ?? {}) as QuizPageState
+  const { session, setResults } = useQuizContext()
+  const questions = session?.questions
 
   const handleComplete = useCallback(
     (score: number) => {
-      navigate('/results', {
-        state: {
-          score,
-          totalQuestions: questions!.length,
-          correctAnswers: score,
-          jobDescription,
-          skills,
-        },
-      })
+      if (!questions) return
+      setResults({ score, totalQuestions: questions.length })
+      navigate('/results')
     },
-    [navigate, questions, jobDescription, skills],
+    [navigate, questions, setResults],
   )
 
   if (!questions || questions.length === 0) {

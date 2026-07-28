@@ -1,50 +1,77 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import ActionButtons from '../components/ActionButtons'
 import Card from '../components/Card'
-import PageHeader from '../components/PageHeader'
-
-const placeholderStats = [
-  { label: 'Score', value: '—' },
-  { label: 'Correct Answers', value: '—' },
-  { label: 'Time Taken', value: '—' },
-]
+import ResultsCard from '../components/ResultsCard'
+import SkillsChips from '../components/SkillsChips'
+import { useQuizContext } from '../context/QuizContext'
 
 export default function Results() {
-  return (
-    <div>
-      <PageHeader
-        title="Results"
-        description="Your quiz performance summary will appear here after completing a quiz."
-      />
+  const navigate = useNavigate()
+  const { session, results, clearAll } = useQuizContext()
 
-      <div className="grid gap-4 sm:grid-cols-3">
-        {placeholderStats.map((stat) => (
-          <Card key={stat.label} className="text-center">
-            <p className="text-3xl font-bold text-slate-900">{stat.value}</p>
-            <p className="mt-1 text-sm font-medium text-slate-500">{stat.label}</p>
-          </Card>
-        ))}
-      </div>
+  const handleGenerateNewQuiz = () => {
+    navigate('/quiz')
+  }
 
-      <Card className="mx-auto mt-8 max-w-2xl text-center">
-        <h2 className="text-lg font-semibold text-slate-900">No results yet</h2>
+  const handleQuit = () => {
+    clearAll()
+    navigate('/')
+  }
+
+  if (!session || !results) {
+    return (
+      <Card className="mx-auto max-w-xl text-center">
+        <h1 className="text-lg font-semibold text-slate-900">No results yet</h1>
         <p className="mt-2 text-sm text-slate-600">
-          Complete a quiz to see a detailed breakdown of your strengths and areas to improve.
+          Complete a quiz to see your performance summary.
         </p>
-        <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <Link
-            to="/quiz"
-            className="w-full rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700 sm:w-auto"
-          >
-            Take a Quiz
-          </Link>
-          <Link
-            to="/"
-            className="w-full rounded-lg border border-slate-300 bg-white px-6 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-100 sm:w-auto"
-          >
-            Back to Home
-          </Link>
-        </div>
+        <Link
+          to="/"
+          className="mt-6 inline-block rounded-lg bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-700"
+        >
+          Go to Home
+        </Link>
       </Card>
+    )
+  }
+
+  const { skills } = session
+  const { score, totalQuestions } = results
+
+  return (
+    <div className="animate-fade-in mx-auto flex min-h-[60vh] w-full max-w-[700px] flex-col items-center justify-center px-4 py-10">
+      <div className="flex w-full flex-col items-center gap-8">
+        <div className="text-center">
+          <div
+            aria-hidden="true"
+            className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100"
+          >
+            <svg
+              className="h-8 w-8 text-green-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h1 className="mt-6 text-3xl font-bold tracking-tight text-slate-900">Quiz Completed</h1>
+          <p className="mt-2 text-base text-slate-600">
+            Great job! Here&apos;s how you performed.
+          </p>
+        </div>
+
+        <div className="w-full">
+          <ResultsCard score={score} totalQuestions={totalQuestions} />
+        </div>
+
+        <div className="w-full">
+          <SkillsChips skills={skills} />
+        </div>
+
+        <ActionButtons onGenerateNewQuiz={handleGenerateNewQuiz} onQuit={handleQuit} />
+      </div>
     </div>
   )
 }
