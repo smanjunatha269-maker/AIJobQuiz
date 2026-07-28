@@ -1,4 +1,9 @@
-// AI service — the single entry point for all AI-powered features.
+// AI service layer — the single entry point for all AI-powered features.
+//
+// The UI never talks to the LLM directly; it only calls the functions exported
+// here and consumes their typed results. To switch to another model or
+// provider, change this file only — the request/prompt/validation details are
+// fully encapsulated.
 
 import type { ExtractSkillsAndQuizResponse, QuizQuestion } from '../types'
 
@@ -8,27 +13,44 @@ const OPENAI_MODEL = 'gpt-4o-mini'
 const SYSTEM_PROMPT = `You are an expert technical recruiter and interview coach.
 
 Analyze the job description provided by the user and:
-1. Extract the 8-12 most important skills, tools, technologies, responsibilities, and business concepts.
-2. Generate exactly 10 multiple-choice interview questions based on those extracted skills.
+1. Extract the most important skills, tools, technologies, responsibilities, and business concepts.
+2. Generate exactly 10 interview questions based on those extracted skills.
 
-Each question must have exactly 4 options. "correctAnswer" must exactly match one of the options. "explanation" must briefly explain why the correct answer is right.
+Rules for the questions:
+- Target a candidate with approximately 3-5 years of professional experience.
+- Mix multiple-choice ("mcq") and true/false ("true_false") questions naturally.
+- "mcq" questions must have exactly 4 options.
+- "true_false" questions must have exactly 2 options: ["True", "False"].
+- "correctAnswer" is the zero-based index of the correct option.
+- "id" is a sequential number starting at 1.
 
-Respond with ONLY valid JSON in exactly this format, with no extra commentary:
+Return ONLY valid JSON in exactly this structure, with no extra commentary:
 {
   "skills": ["Skill 1", "Skill 2"],
   "questions": [
     {
+      "id": 1,
+      "type": "mcq",
       "question": "",
       "options": ["", "", "", ""],
-      "correctAnswer": "",
-      "explanation": ""
+      "correctAnswer": 2
+    },
+    {
+      "id": 2,
+      "type": "true_false",
+      "question": "",
+      "options": ["True", "False"],
+      "correctAnswer": 0
     }
   ]
 }`
 
 /**
- * Sends the complete job description to the OpenAI API in a single call and
+ * Sends the complete job description to the AI model in a single request and
  * returns the extracted skills plus the generated 10-question quiz.
+ *
+ * Throws if the request fails or the response is not valid; callers should
+ * catch and show a friendly error message.
  */
 export async function extractSkillsAndQuiz(
   jobDescription: string,
@@ -85,8 +107,10 @@ function parseResponse(content: string): ExtractSkillsAndQuizResponse {
 
   if (
     !Array.isArray(skills) ||
+    skills.length === 0 ||
     !skills.every((skill) => typeof skill === 'string') ||
     !Array.isArray(questions) ||
+    questions.length === 0 ||
     !questions.every(isQuizQuestion)
   ) {
     throw new Error('OpenAI API response did not match the expected format.')
@@ -97,11 +121,22 @@ function parseResponse(content: string): ExtractSkillsAndQuizResponse {
 
 function isQuizQuestion(value: unknown): value is QuizQuestion {
   const question = value as QuizQuestion
+  if (
+    typeof question?.id !== 'number' ||
+    (question.type !== 'mcq' && question.type !== 'true_false') ||
+    typeof question.question !== 'string' ||
+    !Array.isArray(question.options) ||
+    !question.options.every((option) => typeof option === 'string') ||
+    typeof question.correctAnswer !== 'number'
+  ) {
+    return false
+  }
+
+  const expectedOptionCount = question.type === 'mcq' ? 4 : 2
   return (
-    typeof question?.question === 'string' &&
-    Array.isArray(question.options) &&
-    question.options.every((option) => typeof option === 'string') &&
-    typeof question.correctAnswer === 'string' &&
-    typeof question.explanation === 'string'
+    question.options.length === expectedOptionCount &&
+    Number.isInteger(question.correctAnswer) &&
+    question.correctAnswer >= 0 &&
+    question.correctAnswer < question.options.length
   )
 }

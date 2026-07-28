@@ -5,6 +5,7 @@ interface JobDescriptionFormProps {
   value: string
   onChange: (value: string) => void
   onSubmit: () => void
+  disabled?: boolean
   maxWords?: number
 }
 
@@ -12,12 +13,13 @@ export default function JobDescriptionForm({
   value,
   onChange,
   onSubmit,
+  disabled = false,
   maxWords = 3000,
 }: JobDescriptionFormProps) {
   const wordCount = countWords(value)
   const isEmpty = wordCount === 0
   const isOverLimit = wordCount > maxWords
-  const canSubmit = !isEmpty && !isOverLimit
+  const canSubmit = !isEmpty && !isOverLimit && !disabled
 
   return (
     <Card>
@@ -34,7 +36,8 @@ export default function JobDescriptionForm({
         onChange={(event) => onChange(event.target.value)}
         placeholder="Paste the job description here…"
         rows={12}
-        className="mt-4 w-full resize-y rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm leading-relaxed text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100"
+        disabled={disabled}
+        className="mt-4 w-full resize-y rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm leading-relaxed text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-100 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400"
       />
 
       <div className="mt-3 flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center">

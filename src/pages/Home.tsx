@@ -1,14 +1,40 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Card from '../components/Card'
 import JobDescriptionForm from '../components/JobDescriptionForm'
 import WorkflowInfoCard from '../components/WorkflowInfoCard'
+import { extractSkillsAndQuiz } from '../services/aiService'
+import type { QuizQuestion } from '../types'
 
 export default function Home() {
   const [jobDescription, setJobDescription] = useState('')
+  const [skills, setSkills] = useState<string[]>([])
+  const [questions, setQuestions] = useState<QuizQuestion[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
 
-  const handleSubmit = () => {
-    navigate('/skills', { state: { jobDescription } })
+  // Navigate automatically once a successful response is stored in state.
+  useEffect(() => {
+    if (questions.length > 0) {
+      navigate('/quiz', { state: { jobDescription, skills, questions } })
+    }
+  }, [questions, skills, jobDescription, navigate])
+
+  const handleSubmit = async () => {
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const result = await extractSkillsAndQuiz(jobDescription)
+      setSkills(result.skills)
+      setQuestions(result.questions)
+    } catch (err) {
+      console.error('Quiz generation failed:', err)
+      setError('Unable to generate quiz. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -31,7 +57,28 @@ export default function Home() {
         value={jobDescription}
         onChange={setJobDescription}
         onSubmit={handleSubmit}
+        disabled={isLoading}
       />
+
+      {isLoading && (
+        <Card className="flex items-center justify-center gap-3 py-6">
+          <span
+            aria-hidden="true"
+            className="h-6 w-6 shrink-0 animate-spin rounded-full border-4 border-indigo-100 border-t-indigo-600"
+          />
+          <p className="text-sm font-medium text-slate-700">
+            Analyzing Job Description and generating interview questions...
+          </p>
+        </Card>
+      )}
+
+      {error && !isLoading && (
+        <Card className="border-red-200 bg-red-50 py-4 text-center">
+          <p role="alert" className="text-sm font-medium text-red-700">
+            {error}
+          </p>
+        </Card>
+      )}
     </div>
   )
 }
