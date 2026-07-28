@@ -1,17 +1,17 @@
 import { Link, useNavigate } from 'react-router-dom'
 import ActionButtons from '../components/ActionButtons'
 import Card from '../components/Card'
+import GenerateQuizError from '../components/GenerateQuizError'
+import GenerateQuizLoading from '../components/GenerateQuizLoading'
 import ResultsCard from '../components/ResultsCard'
 import SkillsChips from '../components/SkillsChips'
 import { useQuizContext } from '../context/QuizContext'
+import { useGenerateNewQuiz } from '../hooks/useGenerateNewQuiz'
 
 export default function Results() {
   const navigate = useNavigate()
   const { session, results, clearAll } = useQuizContext()
-
-  const handleGenerateNewQuiz = () => {
-    navigate('/quiz')
-  }
+  const { requestNewQuiz, isLoading, hasError, retry, cancel } = useGenerateNewQuiz()
 
   const handleQuit = () => {
     clearAll()
@@ -37,6 +37,14 @@ export default function Results() {
 
   const { skills } = session
   const { score, totalQuestions } = results
+
+  if (isLoading) {
+    return (
+      <div className="animate-fade-in mx-auto w-full max-w-[700px] px-4 py-10">
+        <GenerateQuizLoading />
+      </div>
+    )
+  }
 
   return (
     <div className="animate-fade-in mx-auto flex min-h-[60vh] w-full max-w-[700px] flex-col items-center justify-center px-4 py-10">
@@ -70,7 +78,17 @@ export default function Results() {
           <SkillsChips skills={skills} />
         </div>
 
-        <ActionButtons onGenerateNewQuiz={handleGenerateNewQuiz} onQuit={handleQuit} />
+        {hasError && (
+          <div className="w-full">
+            <GenerateQuizError onRetry={retry} onCancel={cancel} />
+          </div>
+        )}
+
+        <ActionButtons
+          onGenerateNewQuiz={requestNewQuiz}
+          onQuit={handleQuit}
+          disabled={isLoading}
+        />
       </div>
     </div>
   )
