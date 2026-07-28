@@ -23,10 +23,10 @@ export default function Navbar() {
       <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2">
           <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-sm font-bold text-white">
-            RP
+            IP
           </span>
           <span className="text-lg font-semibold tracking-tight text-slate-900">
-            RolePrep <span className="text-indigo-600">AI</span>
+            InterviewPrep <span className="text-indigo-600">AI</span>
           </span>
         </Link>
 

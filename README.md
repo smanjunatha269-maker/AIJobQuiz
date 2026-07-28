@@ -1,4 +1,4 @@
-# RolePrep AI
+# InterviewPrep AI
 
 AI-powered interview preparation. Preview the skills your target role demands, practice with tailored quizzes, and track your readiness.
 
