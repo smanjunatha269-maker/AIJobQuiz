@@ -5,10 +5,8 @@
 // exposed to the browser.
 
 import type { VercelRequest, VercelResponse } from '@vercel/node'
+import { getOpenRouterModel, logOpenRouterError, OPENROUTER_API_URL } from '../lib/openrouter.js'
 import { parseSkillsAndQuizResponse } from '../lib/quizValidation.js'
-
-const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
-const OPENROUTER_MODEL = 'openai/gpt-4o-mini'
 
 const SYSTEM_PROMPT = `You are an expert technical recruiter and interview coach.
 
@@ -64,6 +62,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    const model = getOpenRouterModel()
     const response = await fetch(OPENROUTER_API_URL, {
       method: 'POST',
       headers: {
@@ -71,7 +70,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: OPENROUTER_MODEL,
+        model,
         temperature: 0.7,
         response_format: { type: 'json_object' },
         messages: [
@@ -82,7 +81,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     })
 
     if (!response.ok) {
-      console.error(`OpenRouter request failed with status ${response.status}`)
+      await logOpenRouterError(response, model)
       return res.status(502).json({ error: 'AI request failed. Please try again.' })
     }
 

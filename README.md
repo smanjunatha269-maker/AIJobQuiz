@@ -18,11 +18,19 @@ Running `npm run dev` alone starts the Vite frontend only — `/api/generate-qui
 
 ### Environment Variables
 
+Set these in your `.env` file (local) or in the Vercel project's Environment Variables settings (production):
+
+```
+OPENROUTER_API_KEY=<your_api_key>
+OPENROUTER_MODEL=nvidia/nemotron-3-ultra-550b-a55b:free
+```
+
 | Variable             | Description                                                                 |
 | -------------------- | --------------------------------------------------------------------------- |
-| `OPENROUTER_API_KEY` | OpenRouter API key used server-side by the quiz-generation serverless function |
+| `OPENROUTER_API_KEY` | OpenRouter API key used server-side by the quiz-generation serverless functions |
+| `OPENROUTER_MODEL`   | OpenRouter model identifier (defaults to `nvidia/nemotron-3-ultra-550b-a55b:free` if unset) |
 
-The key is read from `process.env` inside the serverless function and is never exposed to the browser. For Vercel deployments, set it in the project's Environment Variables settings.
+These are read from `process.env` inside the serverless functions and are never exposed to the browser.
 
 ## Deployment
 
