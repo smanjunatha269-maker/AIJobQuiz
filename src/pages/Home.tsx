@@ -1,25 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Card from '../components/Card'
 import JobDescriptionForm from '../components/JobDescriptionForm'
 import WorkflowInfoCard from '../components/WorkflowInfoCard'
+import { useQuizContext } from '../context/QuizContext'
 import { extractSkillsAndQuiz } from '../services/aiService'
-import type { QuizQuestion } from '../types'
 
 export default function Home() {
   const [jobDescription, setJobDescription] = useState('')
-  const [skills, setSkills] = useState<string[]>([])
-  const [questions, setQuestions] = useState<QuizQuestion[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const navigate = useNavigate()
-
-  // Navigate automatically once a successful response is stored in state.
-  useEffect(() => {
-    if (questions.length > 0) {
-      navigate('/quiz', { state: { jobDescription, skills, questions } })
-    }
-  }, [questions, skills, jobDescription, navigate])
+  const { setSession } = useQuizContext()
 
   const handleSubmit = async () => {
     setIsLoading(true)
@@ -27,8 +19,12 @@ export default function Home() {
 
     try {
       const result = await extractSkillsAndQuiz(jobDescription)
-      setSkills(result.skills)
-      setQuestions(result.questions)
+      setSession({
+        jobDescription,
+        skills: result.skills,
+        questions: result.questions,
+      })
+      navigate('/quiz')
     } catch (err) {
       console.error('Quiz generation failed:', err)
       setError('Unable to generate quiz. Please try again.')
