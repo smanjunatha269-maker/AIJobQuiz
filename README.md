@@ -48,7 +48,6 @@ The project deploys to Vercel out of the box: the Vite app is served statically,
 ## Pages
 
 - `/` — Home
-- `/skills` — Skills Preview
 - `/quiz` — Quiz
 - `/results` — Results
 

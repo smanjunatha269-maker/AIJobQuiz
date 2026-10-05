@@ -23,7 +23,6 @@ interface QuizContextValue {
   setSession: (session: QuizSession) => void
   setResults: (results: QuizResults) => void
   replaceCurrentQuiz: (questions: QuizQuestion[]) => void
-  clearResults: () => void
   clearAll: () => void
 }
 
@@ -42,10 +41,6 @@ export function QuizProvider({ children }: { children: ReactNode }) {
 
   const setResults = useCallback((next: QuizResults) => {
     setResultsState(next)
-  }, [])
-
-  const clearResults = useCallback(() => {
-    setResultsState(null)
   }, [])
 
   const replaceCurrentQuiz = useCallback((questions: QuizQuestion[]) => {
@@ -75,10 +70,9 @@ export function QuizProvider({ children }: { children: ReactNode }) {
       setSession,
       setResults,
       replaceCurrentQuiz,
-      clearResults,
       clearAll,
     }),
-    [session, results, quizKey, setSession, setResults, replaceCurrentQuiz, clearResults, clearAll],
+    [session, results, quizKey, setSession, setResults, replaceCurrentQuiz, clearAll],
   )
 
   return <QuizContext.Provider value={value}>{children}</QuizContext.Provider>
