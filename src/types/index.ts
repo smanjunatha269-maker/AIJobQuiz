@@ -25,10 +25,3 @@ export interface ExtractSkillsAndQuizResponse {
 export interface GenerateNewQuizResponse {
   questions: QuizQuestion[]
 }
-
-export interface QuizResult {
-  score: number
-  totalQuestions: number
-  correctAnswers: number
-  completedAt: string
-}
